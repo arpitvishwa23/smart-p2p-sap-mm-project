@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --brand: #1a3a5c;
+  --brand-light: #e8f0f9;
+  --brand-mid: #2d6aa0;
+  --accent: #f97316;
+  --accent-light: #fff3e8;
+  --success: #16a34a;
+  --success-light: #dcfce7;
+  --warn: #d97706;
+  --warn-light: #fef3c7;
+  --danger: #dc2626;
+  --danger-light: #fee2e2;
+  --info: #0369a1;
+  --info-light: #e0f2fe;
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --border: rgba(0,0,0,0.09);
+  --text: #1a1a2e;
+  --text-muted: #6b7280;
+  --text-light: #9ca3af;
+  --sidebar-w: 220px;
+  --font: 'DM Sans', system-ui, sans-serif;
+  --mono: 'DM Mono', monospace;
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; }
+
+/* Layout */
+.app { display: flex; height: 100vh; overflow: hidden; }
+.sidebar { width: var(--sidebar-w); background: var(--brand); display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0; }
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.content { flex: 1; overflow-y: auto; padding: 24px; }
+
+/* Sidebar */
+.sb-brand { padding: 20px 16px 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.sb-brand-name { font-size: 13px; font-weight: 600; color: #fff; letter-spacing: 0.02em; line-height: 1.3; }
+.sb-brand-sub { font-size: 10px; color: rgba(255,255,255,0.5); letter-spacing: 0.05em; text-transform: uppercase; margin-top: 2px; }
+.sb-section { padding: 12px 8px 4px; font-size: 10px; color: rgba(255,255,255,0.35); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; }
+.sb-item { display: flex; align-items: center; gap: 9px; padding: 8px 12px; margin: 1px 4px; border-radius: 7px; cursor: pointer; color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 400; transition: all 0.15s; }
+.sb-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.sb-item.active { background: rgba(255,255,255,0.14); color: #fff; font-weight: 500; }
+.sb-icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+.sb-badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 10px; }
+
+/* Topbar */
+.tb-title { font-size: 15px; font-weight: 600; color: var(--text); }
+.tb-breadcrumb { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+.tb-right { display: flex; align-items: center; gap: 12px; }
+.tb-role { background: var(--brand-light); color: var(--brand); font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+.tb-user { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.tb-avatar { width: 32px; height: 32px; background: var(--brand); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+
+/* Cards */
+.card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; box-shadow: var(--shadow); }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.card-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.card-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+/* Metric cards */
+.metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+.metric { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); }
+.metric-icon { font-size: 20px; margin-bottom: 8px; }
+.metric-val { font-size: 24px; font-weight: 600; color: var(--text); line-height: 1; }
+.metric-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+.metric-change { font-size: 11px; margin-top: 6px; font-weight: 500; }
+.up { color: var(--success); } .down { color: var(--danger); } .neutral { color: var(--text-muted); }
+
+/* Grid helpers */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); background: #fafafa; }
+td { padding: 11px 12px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #fafafa; }
+
+/* Badges */
+.badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 20px; gap: 4px; }
+.badge-success { background: var(--success-light); color: #15803d; }
+.badge-warn { background: var(--warn-light); color: #92400e; }
+.badge-danger { background: var(--danger-light); color: #991b1b; }
+.badge-info { background: var(--info-light); color: #075985; }
+.badge-neutral { background: #f3f4f6; color: #374151; }
+.badge-purple { background: #ede9fe; color: #5b21b6; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 7px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; font-family: var(--font); }
+.btn-primary { background: var(--brand); color: #fff; }
+.btn-primary:hover { background: #142e4a; }
+.btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn-outline:hover { background: #f9fafb; }
+.btn-success { background: var(--success); color: #fff; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-accent { background: var(--accent); color: #fff; }
+
+/* Forms */
+.form-group { margin-bottom: 14px; }
+.form-label { display: block; font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+.form-control { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 7px; font-size: 13px; font-family: var(--font); color: var(--text); background: var(--surface); outline: none; transition: border-color 0.15s; }
+.form-control:focus { border-color: var(--brand-mid); box-shadow: 0 0 0 3px rgba(45,106,160,0.1); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+/* Progress bar */
+.progress { height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden; margin-top: 4px; }
+.progress-bar { height: 100%; border-radius: 3px; transition: width 0.3s; }
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; background: #f1f5f9; padding: 4px; border-radius: 8px; margin-bottom: 18px; }
+.tab { padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; color: var(--text-muted); transition: all 0.15s; }
+.tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+/* Stepper */
+.stepper { display: flex; align-items: center; margin-bottom: 20px; }
+.step { display: flex; flex-direction: column; align-items: center; }
+.step-circle { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+.step-done { background: var(--success); color: #fff; }
+.step-active { background: var(--brand); color: #fff; }
+.step-pending { background: #e5e7eb; color: var(--text-muted); }
+.step-label { font-size: 10px; color: var(--text-muted); margin-top: 4px; text-align: center; white-space: nowrap; }
+.step-line { flex: 1; height: 2px; background: #e5e7eb; margin: 0 4px; margin-bottom: 16px; }
+.step-line.done { background: var(--success); }
+
+/* Score ring */
+.score-ring { position: relative; width: 80px; height: 80px; }
+.score-ring svg { transform: rotate(-90deg); }
+.score-value { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; font-weight: 700; }
+
+/* Alert */
+.alert { padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; display: flex; align-items: flex-start; gap: 10px; }
+.alert-warn { background: var(--warn-light); color: #78350f; border-left: 3px solid var(--warn); }
+.alert-info { background: var(--info-light); color: #0c4a6e; border-left: 3px solid var(--info); }
+.alert-success { background: var(--success-light); color: #14532d; border-left: 3px solid var(--success); }
+.alert-danger { background: var(--danger-light); color: #7f1d1d; border-left: 3px solid var(--danger); }
+
+/* Timeline */
+.timeline { position: relative; padding-left: 24px; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 1px; background: var(--border); }
+.tl-item { position: relative; margin-bottom: 16px; }
+.tl-dot { position: absolute; left: -20px; width: 10px; height: 10px; border-radius: 50%; background: var(--brand); top: 4px; }
+.tl-title { font-size: 13px; font-weight: 500; }
+.tl-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* Chart bars */
+.bar-chart { display: flex; flex-direction: column; gap: 10px; }
+.bar-row { display: flex; align-items: center; gap: 10px; }
+.bar-label { width: 120px; font-size: 12px; color: var(--text-muted); flex-shrink: 0; text-align: right; }
+.bar-track { flex: 1; height: 20px; background: #f1f5f9; border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 600; color: #fff; }
+.bar-val { font-size: 12px; font-weight: 600; color: var(--text); width: 40px; }
+
+/* Vendor score */
+.vendor-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); }
+.vendor-name { font-size: 14px; font-weight: 600; }
+.vendor-id { font-size: 11px; color: var(--text-muted); font-family: var(--mono); }
+.kpi-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.kpi-row:last-child { border-bottom: none; }
+.kpi-name { font-size: 12px; color: var(--text-muted); }
+.kpi-score { font-size: 13px; font-weight: 600; }
+
+/* Modal overlay */
+.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: flex; align-items: center; justify-content: center; }
+.modal { background: var(--surface); border-radius: 12px; padding: 24px; width: 560px; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.modal-title { font-size: 16px; font-weight: 700; }
+.modal-close { cursor: pointer; font-size: 20px; color: var(--text-muted); line-height: 1; border: none; background: none; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 3px; }
+
+/* Login page */
+.login-bg { min-height: 100vh; background: linear-gradient(135deg, #1a3a5c 0%, #2d6aa0 50%, #1a3a5c 100%); display: flex; align-items: center; justify-content: center; }
+.login-card { background: #fff; border-radius: 16px; padding: 40px; width: 380px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.login-logo { text-align: center; margin-bottom: 28px; }
+.login-logo-icon { font-size: 36px; margin-bottom: 8px; }
+.login-company { font-size: 16px; font-weight: 700; color: var(--brand); }
+.login-tagline { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* Chip */
+.chip { display: inline-flex; align-items: center; gap: 4px; background: var(--brand-light); color: var(--brand); font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 5px; }
+
+/* Notification dot */
+.notif { position: relative; }
+.notif::after { content: ''; position: absolute; top: -2px; right: -2px; width: 7px; height: 7px; background: var(--danger); border-radius: 50%; border: 1.5px solid var(--surface); }
+
+/* Comparison table highlight */
+.best-col { background: #f0fdf4; }
+.best-header { background: var(--success); color: #fff; }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script>
+// ==================== DATA ====================
+const USERS = [
+  { id: 1, name: 'Rajesh Sharma', role: 'Purchase Manager', email: 'rajesh@vishwakarma.in', initials: 'RS', dept: 'Procurement' },
+  { id: 2, name: 'Priya Nair', role: 'Admin', email: 'priya@vishwakarma.in', initials: 'PN', dept: 'Admin' },
+  { id: 3, name: 'Aakash Verma', role: 'Department User', email: 'aakash@vishwakarma.in', initials: 'AV', dept: 'Maintenance' },
+  { id: 4, name: 'Sunita Patel', role: 'Finance User', email: 'sunita@vishwakarma.in', initials: 'SP', dept: 'Finance' },
+  { id: 5, name: 'Mohit Gupta', role: 'Buyer', email: 'mohit@vishwakarma.in', initials: 'MG', dept: 'Procurement' },
+  { id: 6, name: 'Deepa Krishnan', role: 'Store Manager', email: 'deepa@vishwakarma.in', initials: 'DK', dept: 'Stores' },
+  { id: 7, name: 'Vikram Singh', role: 'Management Viewer', email: 'vikram@vishwakarma.in', initials: 'VS', dept: 'Management' },
+];
+
+const VENDORS = [
+  { id: 'V001', name: 'Ahuja Industrial Corp.', city: 'Delhi', category: 'Tools & Safety', gstin: '07AABCA1234A1Z5', contact: '9810012345', rating: 88, status: 'Preferred', ontime: 92, quality: 90, price: 85, responsive: 88, accuracy: 94 },
+  { id: 'V002', name: 'Bharat Electricals Pvt. Ltd.', city: 'Mumbai', category: 'Electrical', gstin: '27AABCB5678B1Z6', contact: '9820023456', rating: 76, status: 'Approved', ontime: 78, quality: 80, price: 72, responsive: 75, accuracy: 77 },
+  { id: 'V003', name: 'Chandra Office Supplies', city: 'Bangalore', category: 'Office', gstin: '29AABCC9012C1Z7', contact: '9945034567', rating: 82, status: 'Approved', ontime: 85, quality: 82, price: 88, responsive: 80, accuracy: 76 },
+  { id: 'V004', name: 'Duratech Fasteners', city: 'Pune', category: 'Hardware', gstin: '27AABCD3456D1Z8', contact: '9960045678', rating: 91, status: 'Preferred', ontime: 95, quality: 93, price: 87, responsive: 90, accuracy: 90 },
+  { id: 'V005', name: 'Evergreen Safety Mart', city: 'Chennai', category: 'Safety', gstin: '33AABCE7890E1Z9', contact: '9444056789', rating: 69, status: 'Watchlist', ontime: 65, quality: 72, price: 74, responsive: 65, accuracy: 68 },
+  { id: 'V006', name: 'Flair Chemicals Ltd.', city: 'Hyderabad', category: 'Chemicals', gstin: '36AABCF1234F1Z0', contact: '9700067890', rating: 84, status: 'Approved', ontime: 88, quality: 85, price: 80, responsive: 83, accuracy: 85 },
+  { id: 'V007', name: 'Granth Packaging Co.', city: 'Kolkata', category: 'Packaging', gstin: '19AABCG5678G1Z1', contact: '9830078901', rating: 73, status: 'Approved', ontime: 70, quality: 75, price: 78, responsive: 72, accuracy: 70 },
+  { id: 'V008', name: 'Hanuman Tools Works', city: 'Ahmedabad', category: 'Tools', gstin: '24AABCH9012H1Z2', contact: '9099089012', rating: 87, status: 'Preferred', ontime: 90, quality: 88, price: 83, responsive: 87, accuracy: 90 },
+  { id: 'V009', name: 'Indus Lubricants Pvt.', city: 'Jamshedpur', category: 'Lubricants', gstin: '20AABCI3456I1Z3', contact: '9709090123', rating: 78, status: 'Approved', ontime: 80, quality: 79, price: 76, responsive: 78, accuracy: 79 },
+  { id: 'V010', name: 'Jai Hind Consumables', city: 'Surat', category: 'Consumables', gstin: '24AABCJ7890J1Z4', contact: '9328001234', rating: 62, status: 'Watchlist', ontime: 58, quality: 65, price: 70, responsive: 60, accuracy: 58 },
+];
+
+const MATERIALS = [
+  { id: 'M001', name: 'Industrial Gloves (Box/100)', unit: 'BOX', price: 1200, category: 'Safety', stock: 45 },
+  { id: 'M002', name: 'Safety Helmet (ISI Mark)', unit: 'EA', price: 850, category: 'Safety', stock: 32 },
+  { id: 'M003', name: 'A4 Copier Paper (500 Sheets)', unit: 'RM', price: 280, category: 'Office', stock: 120 },
+  { id: 'M004', name: 'Ball Bearing 6202 ZZ', unit: 'EA', price: 95, category: 'Mechanical', stock: 250 },
+  { id: 'M005', name: 'M16 Hex Bolt (Pack/50)', unit: 'PK', price: 340, category: 'Hardware', stock: 80 },
+  { id: 'M006', name: 'Lubricating Oil SAE 40 (5L)', unit: 'CAN', price: 2200, category: 'Lubricants', stock: 18 },
+  { id: 'M007', name: 'Industrial Cable Tie (100pcs)', unit: 'PK', price: 150, category: 'Electrical', stock: 200 },
+  { id: 'M008', name: 'Fire Extinguisher 5Kg CO2', unit: 'EA', price: 4500, category: 'Safety', stock: 8 },
+  { id: 'M009', name: 'Anti-Rust Paint 1L (Red)', unit: 'CAN', price: 780, category: 'Maintenance', stock: 28 },
+  { id: 'M010', name: 'Cutting Disc 4" (Pack/25)', unit: 'PK', price: 950, category: 'Tools', stock: 60 },
+  { id: 'M011', name: 'Electrical Switchboard 8-way', unit: 'EA', price: 3400, category: 'Electrical', stock: 5 },
+  { id: 'M012', name: 'PVC Pipe 1" dia 6M', unit: 'EA', price: 380, category: 'Plumbing', stock: 40 },
+  { id: 'M013', name: 'Dust Mask N95 (Pack/20)', unit: 'PK', price: 560, category: 'Safety', stock: 90 },
+  { id: 'M014', name: 'Stapler Heavy Duty', unit: 'EA', price: 680, category: 'Office', stock: 15 },
+  { id: 'M015', name: 'Welding Electrodes E6013 (5kg)', unit: 'PKT', price: 1800, category: 'Welding', stock: 35 },
+];
+
+const REQUISITIONS = [
+  { id: 'PR-2024-001', dept: 'Maintenance', material: 'Safety Helmet (ISI Mark)', qty: 25, unit: 'EA', estValue: 21250, priority: 'High', status: 'Approved', date: '2024-01-08', requester: 'Aakash Verma', approver: 'Rajesh Sharma', remarks: 'Required for new shift workers' },
+  { id: 'PR-2024-002', dept: 'Production', material: 'Ball Bearing 6202 ZZ', qty: 500, unit: 'EA', estValue: 47500, priority: 'Critical', status: 'Pending', date: '2024-01-10', requester: 'Aakash Verma', approver: '', remarks: 'Machine breakdown — urgent' },
+  { id: 'PR-2024-003', dept: 'Admin', material: 'A4 Copier Paper (500 Sheets)', qty: 50, unit: 'RM', estValue: 14000, priority: 'Normal', status: 'RFQ Sent', date: '2024-01-11', requester: 'Priya Nair', approver: 'Rajesh Sharma', remarks: 'Monthly stationery requirement' },
+  { id: 'PR-2024-004', dept: 'Stores', material: 'Lubricating Oil SAE 40 (5L)', qty: 20, unit: 'CAN', estValue: 44000, priority: 'High', status: 'PO Created', date: '2024-01-05', requester: 'Deepa Krishnan', approver: 'Rajesh Sharma', remarks: 'Quarterly replenishment' },
+  { id: 'PR-2024-005', dept: 'EHS', material: 'Fire Extinguisher 5Kg CO2', qty: 10, unit: 'EA', estValue: 45000, priority: 'Critical', status: 'GRN Done', date: '2024-01-03', requester: 'Aakash Verma', approver: 'Rajesh Sharma', remarks: 'Annual safety compliance' },
+  { id: 'PR-2024-006', dept: 'Maintenance', material: 'Cutting Disc 4" (Pack/25)', qty: 30, unit: 'PK', estValue: 28500, priority: 'Normal', status: 'Closed', date: '2024-01-01', requester: 'Aakash Verma', approver: 'Rajesh Sharma', remarks: '' },
+];
+
+const PURCHASE_ORDERS = [
+  { id: 'PO-2024-001', prRef: 'PR-2024-001', vendor: 'Ahuja Industrial Corp.', material: 'Safety Helmet (ISI Mark)', qty: 25, unitPrice: 830, totalValue: 20750, status: 'Delivered', deliveryDate: '2024-01-20', actualDelivery: '2024-01-19', qualityRating: 5 },
+  { id: 'PO-2024-002', prRef: 'PR-2024-004', vendor: 'Indus Lubricants Pvt.', material: 'Lubricating Oil SAE 40 (5L)', qty: 20, unitPrice: 2100, totalValue: 42000, status: 'In Transit', deliveryDate: '2024-01-25', actualDelivery: null, qualityRating: null },
+  { id: 'PO-2024-003', prRef: 'PR-2024-005', vendor: 'Evergreen Safety Mart', material: 'Fire Extinguisher 5Kg CO2', qty: 10, unitPrice: 4300, totalValue: 43000, status: 'GRN Pending', deliveryDate: '2024-01-18', actualDelivery: '2024-01-22', qualityRating: null },
+  { id: 'PO-2024-004', prRef: 'PR-2024-006', vendor: 'Hanuman Tools Works', material: 'Cutting Disc 4" (Pack/25)', qty: 30, unitPrice: 920, totalValue: 27600, status: 'Invoice Pending', deliveryDate: '2024-01-15', actualDelivery: '2024-01-14', qualityRating: 4 },
+];
+
+const INVOICES = [
+  { id: 'INV-2024-001', poRef: 'PO-2024-001', vendor: 'Ahuja Industrial Corp.', amount: 20750, gst: 3735, total: 24485, status: 'Paid', dueDate: '2024-02-04', paidDate: '2024-02-01' },
+  { id: 'INV-2024-002', poRef: 'PO-2024-004', vendor: 'Hanuman Tools Works', amount: 27600, gst: 4968, total: 32568, status: 'Approved', dueDate: '2024-02-13', paidDate: null },
+];
+
+// State
+let state = {
+  page: 'login',
+  currentUser: null,
+  tab: 0,
+  modal: null,
+  prForm: { dept: '', material: '', qty: '', unit: 'EA', priority: 'Normal', remarks: '' },
+  vendorTab: 0,
+};
+
+// ==================== RENDER ====================
+function render() {
+  const root = document.getElementById('root');
+  if (state.page === 'login') { root.innerHTML = renderLogin(); bindLoginEvents(); return; }
+  root.innerHTML = renderApp();
+  bindAppEvents();
+  if (state.modal) { renderModal(); }
+}
+
+function renderLogin() {
+  return `<div class="login-bg">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="login-logo-icon">⚙️</div>
+        <div class="login-company">Vishwakarma Industrial Supplies</div>
+        <div class="login-tagline">Smart P2P Management System</div>
+      </div>
+      <div class="form-group"><label class="form-label">Email Address</label>
+        <input class="form-control" id="li-email" type="email" value="rajesh@vishwakarma.in" placeholder="Enter your email" /></div>
+      <div class="form-group"><label class="form-label">Password</label>
+        <input class="form-control" id="li-pass" type="password" value="••••••••" /></div>
+      <div class="form-group" style="margin-bottom:18px">
+        <label class="form-label">Login As (Demo)</label>
+        <select class="form-control" id="li-role">
+          ${USERS.map((u,i) => `<option value="${i}">${u.name} — ${u.role}</option>`).join('')}
+        </select>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:11px" id="li-btn">Sign In →</button>
+      <div style="text-align:center;margin-top:14px;font-size:11px;color:#9ca3af">
+        All 7 roles available • Demo mode
+      </div>
+    </div>
+  </div>`;
+}
+
+function bindLoginEvents() {
+  document.getElementById('li-btn').onclick = () => {
+    const idx = parseInt(document.getElementById('li-role').value);
+    state.currentUser = USERS[idx];
+    state.page = 'dashboard';
+    render();
+  };
+}
+
+function renderApp() {
+  const u = state.currentUser;
+  const pages = {
+    dashboard: renderDashboard,
+    requisitions: renderRequisitions,
+    approval: renderApproval,
+    rfq: renderRFQ,
+    purchase_orders: renderPurchaseOrders,
+    grn: renderGRN,
+    invoices: renderInvoices,
+    vendor_analytics: renderVendorAnalytics,
+    reports: renderReports,
+    master_data: renderMasterData,
+  };
+  const pageContent = (pages[state.page] || renderDashboard)();
+
+  const menuItems = [
+    { icon: '📊', label: 'Dashboard', key: 'dashboard', section: 'Main' },
+    { icon: '📋', label: 'Requisitions', key: 'requisitions', section: 'Procurement', badge: 3 },
+    { icon: '✅', label: 'Approvals', key: 'approval', section: 'Procurement', badge: 2 },
+    { icon: '📨', label: 'RFQ', key: 'rfq', section: 'Procurement' },
+    { icon: '🛒', label: 'Purchase Orders', key: 'purchase_orders', section: 'Operations' },
+    { icon: '📦', label: 'Goods Receipt', key: 'grn', section: 'Operations' },
+    { icon: '🧾', label: 'Invoices', key: 'invoices', section: 'Finance' },
+    { icon: '⭐', label: 'Vendor Analytics', key: 'vendor_analytics', section: 'Intelligence' },
+    { icon: '📈', label: 'Reports', key: 'reports', section: 'Intelligence' },
+    { icon: '🗂️', label: 'Master Data', key: 'master_data', section: 'Admin' },
+  ];
+
+  let lastSection = '';
+  const menuHtml = menuItems.map(m => {
+    let s = '';
+    if (m.section !== lastSection) { s = `<div class="sb-section">${m.section}</div>`; lastSection = m.section; }
+    return s + `<div class="sb-item ${state.page === m.key ? 'active' : ''}" data-page="${m.key}">
+      <span class="sb-icon">${m.icon}</span>${m.label}
+      ${m.badge ? `<span class="sb-badge">${m.badge}</span>` : ''}
+    </div>`;
+  }).join('');
+
+  return `<div class="app">
+    <div class="sidebar">
+      <div class="sb-brand">
+        <div style="font-size:22px;margin-bottom:6px">⚙️</div>
+        <div class="sb-brand-name">Vishwakarma<br>Industrial Supplies</div>
+        <div class="sb-brand-sub">P2P System v2.4</div>
+      </div>
+      ${menuHtml}
+      <div style="flex:1"></div>
+      <div style="padding:12px 8px;border-top:1px solid rgba(255,255,255,0.1);margin-top:8px">
+        <div class="sb-item" id="logout-btn"><span class="sb-icon">🚪</span>Sign Out</div>
+      </div>
+    </div>
+    <div class="main">
+      <div class="topbar">
+        <div>
+          <div class="tb-title">${getPageTitle()}</div>
+          <div class="tb-breadcrumb">Vishwakarma Industrial Supplies / ${getPageTitle()}</div>
+        </div>
+        <div class="tb-right">
+          <div class="tb-role">${u.role}</div>
+          <div class="notif" style="font-size:20px;cursor:pointer" title="Notifications">🔔</div>
+          <div class="tb-user">
+            <div class="tb-avatar">${u.initials}</div>
+            <div>
+              <div style="font-size:13px;font-weight:600">${u.name}</div>
+              <div style="font-size:11px;color:var(--text-muted)">${u.dept}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="content">${pageContent}</div>
+    </div>
+  </div>`;
+}
+
+function getPageTitle() {
+  const titles = { dashboard:'Dashboard', requisitions:'Purchase Requisitions', approval:'Approval Workflow',
+    rfq:'RFQ Management', purchase_orders:'Purchase Orders', grn:'Goods Receipt', invoices:'Invoice Verification',
+    vendor_analytics:'Vendor Analytics', reports:'Reports & Analytics', master_data:'Master Data' };
+  return titles[state.page] || 'Dashboard';
+}
+
+// ==================== DASHBOARD ====================
+function renderDashboard() {
+  const u = state.currentUser;
+  return `
+    <div class="alert alert-info">
+      <span>👋</span>
+      <span>Welcome back, <strong>${u.name}</strong>. You have <strong>2 pending approvals</strong> and <strong>1 overdue delivery</strong> that need attention.</span>
+    </div>
+    <div class="metric-grid">
+      <div class="metric">
+        <div class="metric-icon">📋</div>
+        <div class="metric-val">24</div>
+        <div class="metric-label">Total PRs (Jan)</div>
+        <div class="metric-change up">↑ 4 from last month</div>
+      </div>
+      <div class="metric">
+        <div class="metric-icon">🛒</div>
+        <div class="metric-val">₹8.4L</div>
+        <div class="metric-label">PO Value (Jan)</div>
+        <div class="metric-change up">↑ 12% MoM</div>
+      </div>
+      <div class="metric">
+        <div class="metric-icon">✅</div>
+        <div class="metric-val">94%</div>
+        <div class="metric-label">On-time Delivery</div>
+        <div class="metric-change up">↑ 2% vs target</div>
+      </div>
+      <div class="metric">
+        <div class="metric-icon">⚠️</div>
+        <div class="metric-val">3</div>
+        <div class="metric-label">Pending Approvals</div>
+        <div class="metric-change neutral">Action required</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Monthly Spend Trend</div><div class="card-subtitle">Jan 2024 procurement spend (₹ Lakhs)</div></div>
+        </div>
+        <div class="bar-chart">
+          ${[['Aug','4.2','#a3c4f3'],['Sep','5.8','#6fa8e8'],['Oct','6.1','#3d8dd4'],['Nov','7.4','#1e6db5'],['Dec','6.9','#164f8c'],['Jan','8.4','#1a3a5c']].map(([m,v,c]) => `
+          <div class="bar-row">
+            <div class="bar-label">${m}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${parseFloat(v)/9*100}%;background:${c}">₹${v}L</div></div>
+            <div class="bar-val">₹${v}L</div>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">P2P Cycle Status</div><div class="card-subtitle">Current pipeline overview</div></div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          ${[['Draft PRs','2','#6b7280'],['Pending Approval','3','#d97706'],['RFQ Open','2','#0369a1'],['Active POs','4','#1a3a5c'],['GRN Pending','1','#dc2626'],['Invoice Processing','2','#7c3aed'],['Payments Pending','1','#16a34a']].map(([l,v,c]) => `
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;align-items:center;gap:8px"><div style="width:8px;height:8px;border-radius:50%;background:${c}"></div><span style="font-size:13px">${l}</span></div>
+            <span style="font-size:15px;font-weight:700;color:${c}">${v}</span>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Recent PRs</div><button class="btn btn-outline btn-sm" data-page="requisitions">View All</button></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>PR No.</th><th>Material</th><th>Value</th><th>Status</th></tr></thead>
+            <tbody>
+              ${REQUISITIONS.slice(0,4).map(r => `<tr>
+                <td style="font-family:var(--mono);font-size:12px">${r.id}</td>
+                <td>${r.material.length > 22 ? r.material.slice(0,22)+'…' : r.material}</td>
+                <td>₹${r.estValue.toLocaleString('en-IN')}</td>
+                <td>${statusBadge(r.status)}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Top Vendors (Score)</div><button class="btn btn-outline btn-sm" data-page="vendor_analytics">Details</button></div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          ${[...VENDORS].sort((a,b)=>b.rating-a.rating).slice(0,5).map((v,i) => `
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="font-size:13px;font-weight:700;color:var(--text-muted);width:16px">${i+1}</div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:500">${v.name}</div>
+              <div class="progress" style="margin-top:4px"><div class="progress-bar" style="width:${v.rating}%;background:${v.rating>=85?'#16a34a':v.rating>=70?'#d97706':'#dc2626'}"></div></div>
+            </div>
+            <div style="font-size:15px;font-weight:700;color:var(--text);min-width:32px;text-align:right">${v.rating}</div>
+            <div>${v.status==='Preferred'?'<span class="badge badge-success">⭐ Preferred</span>':v.status==='Watchlist'?'<span class="badge badge-danger">⚠ Watch</span>':'<span class="badge badge-neutral">Approved</span>'}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+// ==================== REQUISITIONS ====================
+function renderRequisitions() {
+  const tabs = ['All PRs', 'New PR', 'Track'];
+  return `
+    <div class="tabs">${tabs.map((t,i)=>`<div class="tab ${state.tab===i?'active':''}" data-tab="${i}">${t}</div>`).join('')}</div>
+    ${state.tab === 0 ? renderPRList() : state.tab === 1 ? renderPRForm() : renderPRTrack()}`;
+}
+
+function renderPRList() {
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:13px;color:var(--text-muted)">${REQUISITIONS.length} requisitions found</div>
+      <button class="btn btn-primary btn-sm" data-tab-switch="1">+ New PR</button>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>PR No.</th><th>Dept</th><th>Material</th><th>Qty</th><th>Est. Value</th><th>Priority</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            ${REQUISITIONS.map(r => `<tr>
+              <td><span style="font-family:var(--mono);font-size:12px;color:var(--brand)">${r.id}</span></td>
+              <td><span class="chip">${r.dept}</span></td>
+              <td style="max-width:160px">${r.material}</td>
+              <td>${r.qty} ${r.unit}</td>
+              <td style="font-weight:600">₹${r.estValue.toLocaleString('en-IN')}</td>
+              <td>${priorityBadge(r.priority)}</td>
+              <td style="font-size:12px;color:var(--text-muted)">${r.date}</td>
+              <td>${statusBadge(r.status)}</td>
+              <td><button class="btn btn-outline btn-sm" onclick="openPRModal('${r.id}')">View</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function renderPRForm() {
+  return `
+    <div class="card" style="max-width:640px">
+      <div class="card-header"><div class="card-title">Create Purchase Requisition</div><div class="card-subtitle">Vishwakarma Industrial Supplies Pvt. Ltd.</div></div>
+      <div class="stepper">
+        ${['Dept. Request','PR Creation','Approval','RFQ/Vendor','PO','GRN','Invoice'].map((s,i)=>`
+          <div class="step"><div class="step-circle step-active" style="${i>0?'background:var(--step-pending,#e5e7eb);color:#6b7280':''}">${i+1}</div><div class="step-label">${s}</div></div>
+          ${i<6?`<div class="step-line"></div>`:''}`).join('')}
+      </div>
+      <form id="pr-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Department *</label>
+            <select class="form-control" id="pr-dept" required>
+              <option value="">Select Department</option>
+              ${['Maintenance','Production','Admin','EHS','Stores','Quality','IT','HR','Finance'].map(d=>`<option>${d}</option>`).join('')}
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Priority *</label>
+            <select class="form-control" id="pr-priority">
+              <option>Normal</option><option>High</option><option>Critical</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Material / Item Description *</label>
+          <select class="form-control" id="pr-material">
+            <option value="">Select material or type custom</option>
+            ${MATERIALS.map(m=>`<option value="${m.id}">${m.name} (Est. ₹${m.price}/${m.unit})</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Quantity *</label>
+            <input class="form-control" type="number" id="pr-qty" min="1" placeholder="Enter quantity" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Unit of Measure</label>
+            <select class="form-control" id="pr-unit">
+              <option>EA</option><option>BOX</option><option>PK</option><option>RM</option><option>CAN</option><option>KG</option><option>M</option><option>LTR</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Required By Date</label>
+            <input class="form-control" type="date" id="pr-date" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Estimated Value (₹)</label>
+            <input class="form-control" type="number" id="pr-value" placeholder="Auto or enter manually" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Justification / Remarks</label>
+          <textarea class="form-control" id="pr-remarks" rows="3" placeholder="Explain the business need for this purchase..."></textarea>
+        </div>
+        <div style="background:var(--brand-light);border-radius:8px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--brand)">
+          <strong>Approval Matrix:</strong> Value ≤ ₹10,000 → Auto-approved | ₹10,001–₹50,000 → Purchase Manager | ₹50,001–₹2,00,000 → GM | > ₹2,00,000 → MD
+        </div>
+        <div style="display:flex;gap:10px">
+          <button type="button" class="btn btn-primary" id="pr-submit-btn">Submit PR for Approval</button>
+          <button type="button" class="btn btn-outline" data-tab-switch="0">Cancel</button>
+        </div>
+      </form>
+    </div>`;
+}
+
+function renderPRTrack() {
+  return `<div class="card">
+    <div class="card-header"><div class="card-title">PR Tracking — Full P2P Lifecycle</div></div>
+    <div class="alert alert-info"><span>ℹ️</span><span>Select a PR below to see its complete audit trail from requisition to payment.</span></div>
+    ${REQUISITIONS.map(r => `
+    <div style="background:#fafafa;border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-family:var(--mono);font-size:12px;color:var(--brand);font-weight:600">${r.id}</span>
+          <span style="font-size:13px;font-weight:500">${r.material.slice(0,30)}${r.material.length>30?'…':''}</span>
+          ${priorityBadge(r.priority)}
+        </div>
+        ${statusBadge(r.status)}
+      </div>
+      <div style="display:flex;align-items:center;gap:0;overflow-x:auto;padding-bottom:4px">
+        ${['PR Created','Approved','RFQ Sent','PO Created','GRN Done','Invoice','Paid'].map((s,i) => {
+          const stepStatuses = ['Draft','Pending','Approved','RFQ Sent','PO Created','GRN Done','Closed'];
+          const currentIdx = stepStatuses.indexOf(r.status);
+          const done = i < (currentIdx === -1 ? 3 : currentIdx);
+          const active = i === (currentIdx === -1 ? 0 : currentIdx-1);
+          return `<div style="display:flex;align-items:center">
+            <div style="text-align:center;min-width:70px">
+              <div style="width:26px;height:26px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;background:${done?'var(--success)':active?'var(--brand)':'#e5e7eb'};color:${done||active?'#fff':'#9ca3af'}">${done?'✓':i+1}</div>
+              <div style="font-size:10px;color:var(--text-muted);margin-top:3px;white-space:nowrap">${s}</div>
+            </div>
+            ${i<6?`<div style="width:20px;height:2px;background:${done?'var(--success)':'#e5e7eb'};flex-shrink:0"></div>`:''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
+
+// ==================== APPROVAL ====================
+function renderApproval() {
+  const pending = REQUISITIONS.filter(r => r.status === 'Pending');
+  return `
+    <div class="alert alert-warn"><span>⚠️</span><span><strong>${pending.length} requisitions</strong> awaiting your approval. Please review and act promptly.</span></div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Pending Approvals</div><span class="badge badge-warn">${pending.length} Pending</span></div>
+        ${pending.map(r => `
+        <div style="border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div>
+              <div style="font-family:var(--mono);font-size:12px;color:var(--brand);font-weight:600">${r.id}</div>
+              <div style="font-size:14px;font-weight:600;margin-top:2px">${r.material}</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${r.dept} • ${r.requester} • ${r.date}</div>
+            </div>
+            ${priorityBadge(r.priority)}
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#f9fafb;border-radius:6px;padding:10px;margin-bottom:10px;font-size:12px">
+            <div><span style="color:var(--text-muted)">Qty:</span> <strong>${r.qty} ${r.unit}</strong></div>
+            <div><span style="color:var(--text-muted)">Est. Value:</span> <strong>₹${r.estValue.toLocaleString('en-IN')}</strong></div>
+            <div style="grid-column:span 2"><span style="color:var(--text-muted)">Remarks:</span> ${r.remarks || '—'}</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-success btn-sm" onclick="approveReject('${r.id}','approve')">✓ Approve</button>
+            <button class="btn btn-danger btn-sm" onclick="approveReject('${r.id}','reject')">✗ Reject</button>
+            <button class="btn btn-outline btn-sm">Hold</button>
+          </div>
+        </div>`).join('')}
+        ${pending.length===0?'<div style="text-align:center;color:var(--text-muted);padding:20px">✓ No pending approvals</div>':''}
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Approval Matrix</div></div>
+        <table><thead><tr><th>Amount Range</th><th>Approver</th><th>TAT</th></tr></thead>
+        <tbody>
+          <tr><td>Up to ₹10,000</td><td>Auto-Approved</td><td>Instant</td></tr>
+          <tr><td>₹10,001 – ₹50,000</td><td>Purchase Manager</td><td>24 hrs</td></tr>
+          <tr><td>₹50,001 – ₹2,00,000</td><td>General Manager</td><td>48 hrs</td></tr>
+          <tr><td>₹2,00,001 – ₹10,00,000</td><td>Director</td><td>72 hrs</td></tr>
+          <tr><td>Above ₹10,00,000</td><td>Managing Director</td><td>5 days</td></tr>
+        </tbody></table>
+        <div style="margin-top:20px"><div class="card-title" style="margin-bottom:12px">Recent Decisions</div>
+          <div class="timeline">
+            ${REQUISITIONS.filter(r=>r.approver).slice(0,4).map(r=>`
+            <div class="tl-item">
+              <div class="tl-dot"></div>
+              <div class="tl-title">${r.id} — ${r.status}</div>
+              <div class="tl-sub">By ${r.approver} on ${r.date}</div>
+            </div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ==================== RFQ ====================
+function renderRFQ() {
+  const rfqMats = REQUISITIONS.filter(r => ['Approved','RFQ Sent'].includes(r.status));
+  return `
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-title">RFQ — Send to Vendors</div></div>
+        <div class="alert alert-info"><span>📨</span><span>RFQ will be sent to selected vendors via email/portal. Vendors can submit quotations online.</span></div>
+        <div class="form-group">
+          <label class="form-label">Select PR</label>
+          <select class="form-control">
+            ${rfqMats.map(r=>`<option>${r.id} — ${r.material.slice(0,40)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Select Vendors (Multi-select)</label>
+          <div style="border:1px solid var(--border);border-radius:7px;padding:10px;display:flex;flex-direction:column;gap:6px">
+            ${VENDORS.slice(0,6).map(v=>`<label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
+              <input type="checkbox" ${['V001','V004','V008'].includes(v.id)?'checked':''} /> ${v.name} <span class="badge ${v.status==='Preferred'?'badge-success':v.status==='Watchlist'?'badge-danger':'badge-neutral'}" style="margin-left:auto">${v.status}</span>
+            </label>`).join('')}
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">RFQ Deadline</label><input class="form-control" type="date" /></div>
+          <div class="form-group"><label class="form-label">Delivery Required By</label><input class="form-control" type="date" /></div>
+        </div>
+        <div class="form-group"><label class="form-label">Special Terms / Notes</label><textarea class="form-control" rows="2" placeholder="Payment terms, quality requirements..."></textarea></div>
+        <button class="btn btn-primary">Send RFQ to Selected Vendors</button>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Quotation Comparison</div><div class="card-subtitle">PR-2024-003 — A4 Copier Paper</div></div>
+        <div class="table-wrap">
+          <table style="font-size:12px">
+            <thead>
+              <tr>
+                <th>Parameter</th>
+                <th>Chandra Office</th>
+                <th class="best-header" style="color:#fff">Bharat Elec.</th>
+                <th>Jai Hind</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="font-weight:500">Unit Price (₹)</td><td>275</td><td class="best-col" style="font-weight:700;color:var(--success)">260 ✓</td><td>290</td></tr>
+              <tr><td style="font-weight:500">Total Value (₹)</td><td>13,750</td><td class="best-col" style="font-weight:700;color:var(--success)">13,000 ✓</td><td>14,500</td></tr>
+              <tr><td style="font-weight:500">Delivery Days</td><td>5</td><td class="best-col">4 ✓</td><td>7</td></tr>
+              <tr><td style="font-weight:500">Payment Terms</td><td>30 days</td><td class="best-col">30 days</td><td>15 days</td></tr>
+              <tr><td style="font-weight:500">GST Rate</td><td>12%</td><td class="best-col">12%</td><td>12%</td></tr>
+              <tr><td style="font-weight:500">Vendor Score</td><td>82</td><td class="best-col" style="font-weight:700;color:var(--success)">76</td><td>62</td></tr>
+              <tr><td style="font-weight:500">ISO Certified</td><td>Yes</td><td class="best-col">Yes</td><td>No</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert alert-success" style="margin-top:12px"><span>🤖</span><span><strong>Recommendation:</strong> Bharat Electricals Pvt. Ltd. offers the lowest price (₹260/RM) with faster delivery. Recommend for PO creation.</span></div>
+        <button class="btn btn-primary btn-sm">Create PO with Bharat Electricals</button>
+      </div>
+    </div>`;
+}
+
+// ==================== PURCHASE ORDERS ====================
+function renderPurchaseOrders() {
+  return `
+    <div class="metric-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="metric"><div class="metric-icon">🛒</div><div class="metric-val">4</div><div class="metric-label">Active POs</div></div>
+      <div class="metric"><div class="metric-icon">💰</div><div class="metric-val">₹1.33L</div><div class="metric-label">Total PO Value</div></div>
+      <div class="metric"><div class="metric-icon">✅</div><div class="metric-val">1</div><div class="metric-label">Delivered</div></div>
+      <div class="metric"><div class="metric-icon">🚚</div><div class="metric-val">1</div><div class="metric-label">In Transit</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Purchase Orders</div>
+        <button class="btn btn-primary btn-sm">+ New PO</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>PO No.</th><th>PR Ref.</th><th>Vendor</th><th>Material</th><th>Qty</th><th>Unit Price</th><th>Total</th><th>Delivery Due</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            ${PURCHASE_ORDERS.map(po => `<tr>
+              <td style="font-family:var(--mono);font-size:12px;color:var(--brand)">${po.id}</td>
+              <td style="font-family:var(--mono);font-size:12px">${po.prRef}</td>
+              <td style="font-size:12px">${po.vendor}</td>
+              <td style="max-width:120px;font-size:12px">${po.material.slice(0,25)}…</td>
+              <td>${po.qty}</td>
+              <td>₹${po.unitPrice.toLocaleString('en-IN')}</td>
+              <td style="font-weight:600">₹${po.totalValue.toLocaleString('en-IN')}</td>
+              <td style="font-size:12px;color:${po.actualDelivery&&po.actualDelivery>po.deliveryDate?'var(--danger)':'var(--text-muted)'}">${po.deliveryDate}</td>
+              <td>${statusBadge(po.status)}</td>
+              <td><button class="btn btn-outline btn-sm">View PO</button></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ==================== GRN ====================
+function renderGRN() {
+  return `
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Record Goods Receipt</div><div class="card-subtitle">Goods Receipt Note (GRN)</div></div>
+        <div class="form-group"><label class="form-label">Select PO</label>
+          <select class="form-control">
+            <option>PO-2024-003 — Fire Extinguisher 5Kg CO2</option>
+            <option>PO-2024-004 — Cutting Disc 4"</option>
+          </select>
+        </div>
+        <div style="background:#f9fafb;border-radius:8px;padding:12px;margin-bottom:14px;font-size:12px">
+          <div style="font-weight:600;margin-bottom:6px">PO Details</div>
+          <div class="form-row-3" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+            <div><div style="color:var(--text-muted)">Vendor</div><div style="font-weight:500">Evergreen Safety</div></div>
+            <div><div style="color:var(--text-muted)">PO Qty</div><div style="font-weight:500">10 EA</div></div>
+            <div><div style="color:var(--text-muted)">PO Value</div><div style="font-weight:500">₹43,000</div></div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Received Qty</label><input class="form-control" type="number" value="10" /></div>
+          <div class="form-group"><label class="form-label">Received Date</label><input class="form-control" type="date" /></div>
+        </div>
+        <div class="form-group"><label class="form-label">Quality Inspection</label>
+          <select class="form-control" id="quality-sel">
+            <option>Accepted — Full</option>
+            <option>Accepted — Partial (with shortfall)</option>
+            <option>Rejected — Return to Vendor</option>
+            <option>Accepted — With Remarks</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Inspector Name</label><input class="form-control" value="Deepa Krishnan" /></div>
+        <div class="form-group"><label class="form-label">Storage Location / Bin</label><input class="form-control" placeholder="e.g. Warehouse-A / Rack-12" /></div>
+        <div class="form-group"><label class="form-label">Remarks / Issues</label><textarea class="form-control" rows="2" placeholder="Delivery delay of 4 days noted..."></textarea></div>
+        <div class="alert alert-warn"><span>⚠️</span><span>Delivery was <strong>4 days late</strong> vs PO delivery date. This will impact Evergreen Safety Mart's vendor score.</span></div>
+        <button class="btn btn-primary">Post GRN & Trigger Invoice Processing</button>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">GRN History</div></div>
+        <div class="timeline" style="padding-top:8px">
+          <div class="tl-item"><div class="tl-dot" style="background:var(--success)"></div>
+            <div class="tl-title">GRN-2024-001 — Safety Helmets</div>
+            <div class="tl-sub">Received 25 EA from Ahuja Industrial • On-time • Quality: Excellent</div></div>
+          <div class="tl-item"><div class="tl-dot" style="background:var(--success)"></div>
+            <div class="tl-title">GRN-2024-002 — Cutting Discs</div>
+            <div class="tl-sub">Received 30 PK from Hanuman Tools • 1 day early • Quality: Good</div></div>
+          <div class="tl-item"><div class="tl-dot" style="background:var(--danger)"></div>
+            <div class="tl-title">GRN-2024-003 — Fire Extinguisher (Pending)</div>
+            <div class="tl-sub">Received 10 EA from Evergreen Safety • 4 days late ⚠️</div></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ==================== INVOICES ====================
+function renderInvoices() {
+  return `
+    <div class="metric-grid">
+      <div class="metric"><div class="metric-icon">🧾</div><div class="metric-val">2</div><div class="metric-label">Total Invoices</div></div>
+      <div class="metric"><div class="metric-icon">✅</div><div class="metric-val">₹24,485</div><div class="metric-label">Paid (incl. GST)</div></div>
+      <div class="metric"><div class="metric-icon">⏳</div><div class="metric-val">₹32,568</div><div class="metric-label">Pending Payment</div></div>
+      <div class="metric"><div class="metric-icon">📊</div><div class="metric-val">18%</div><div class="metric-label">Avg GST Rate</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Invoice Verification — 3-Way Match</div><div class="card-subtitle">PR ↔ PO ↔ GRN ↔ Invoice</div></div>
+      <div class="alert alert-success"><span>✅</span><span>3-way match validates that the invoice quantity, price, and terms match the PO and GRN. Any mismatch blocks payment.</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Invoice No.</th><th>PO Ref.</th><th>Vendor</th><th>Amount</th><th>GST (18%)</th><th>Total</th><th>Due Date</th><th>3-Way Match</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            ${INVOICES.map(inv => `<tr>
+              <td style="font-family:var(--mono);font-size:12px;color:var(--brand)">${inv.id}</td>
+              <td style="font-family:var(--mono);font-size:12px">${inv.poRef}</td>
+              <td style="font-size:12px">${inv.vendor}</td>
+              <td>₹${inv.amount.toLocaleString('en-IN')}</td>
+              <td style="color:var(--text-muted)">₹${inv.gst.toLocaleString('en-IN')}</td>
+              <td style="font-weight:700">₹${inv.total.toLocaleString('en-IN')}</td>
+              <td style="font-size:12px">${inv.dueDate}</td>
+              <td><span class="badge badge-success">✓ Matched</span></td>
+              <td>${statusBadge(inv.status)}</td>
+              <td>${inv.status==='Approved'?`<button class="btn btn-success btn-sm">Mark Paid</button>`:`<span style="font-size:12px;color:var(--text-muted)">${inv.paidDate}</span>`}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ==================== VENDOR ANALYTICS ====================
+function renderVendorAnalytics() {
+  const tabs = ['Scorecards','Rankings','Alerts'];
+  return `
+    <div class="tabs">${tabs.map((t,i)=>`<div class="tab ${state.vendorTab===i?'active':''}" data-vendor-tab="${i}">${t}</div>`).join('')}</div>
+    ${state.vendorTab === 0 ? renderScorecards() : state.vendorTab === 1 ? renderRankings() : renderAlerts()}`;
+}
+
+function renderScorecards() {
+  const sorted = [...VENDORS].sort((a,b)=>b.rating-a.rating).slice(0,6);
+  return `
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+      ${sorted.map(v => {
+        const clr = v.rating>=85?'#16a34a':v.rating>=70?'#d97706':'#dc2626';
+        const kpis = [['On-Time Delivery',v.ontime],['Product Quality',v.quality],['Price Competitiveness',v.price],['Responsiveness',v.responsive],['Order Accuracy',v.accuracy]];
+        return `<div class="vendor-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+            <div>
+              <div class="vendor-name">${v.name}</div>
+              <div class="vendor-id">${v.id} • ${v.city}</div>
+              <div style="margin-top:4px">${v.status==='Preferred'?'<span class="badge badge-success">⭐ Preferred</span>':v.status==='Watchlist'?'<span class="badge badge-danger">⚠ Watchlist</span>':'<span class="badge badge-neutral">Approved</span>'}</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:26px;font-weight:800;color:${clr}">${v.rating}</div>
+              <div style="font-size:10px;color:var(--text-muted)">/ 100</div>
+            </div>
+          </div>
+          <div style="height:4px;background:#e5e7eb;border-radius:2px;margin-bottom:12px;overflow:hidden">
+            <div style="width:${v.rating}%;height:100%;background:${clr};border-radius:2px"></div>
+          </div>
+          ${kpis.map(([k,score]) => `
+          <div class="kpi-row">
+            <span class="kpi-name">${k}</span>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="width:50px;height:4px;background:#e5e7eb;border-radius:2px;overflow:hidden">
+                <div style="width:${score}%;height:100%;background:${score>=85?'#16a34a':score>=70?'#d97706':'#dc2626'};border-radius:2px"></div>
+              </div>
+              <span class="kpi-score" style="color:${score>=85?'#16a34a':score>=70?'#d97706':'#dc2626'}">${score}</span>
+            </div>
+          </div>`).join('')}
+          <div style="margin-top:10px;font-size:11px;color:var(--text-muted)">Category: ${v.category}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="card-header"><div class="card-title">KPI Weightage Formula</div></div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap;font-size:13px">
+        ${[['On-Time Delivery','30%','🕐'],['Product Quality','25%','⭐'],['Price Competitiveness','20%','💰'],['Responsiveness','15%','📞'],['Order Accuracy','10%','✅']].map(([k,w,ic])=>`
+        <div style="display:flex;align-items:center;gap:8px;background:var(--brand-light);padding:8px 14px;border-radius:8px">
+          <span>${ic}</span><span>${k}</span><span style="font-weight:700;color:var(--brand)">${w}</span>
+        </div>`).join('')}
+      </div>
+      <div style="margin-top:12px;background:#f9fafb;border-radius:8px;padding:10px;font-family:var(--mono);font-size:13px;color:var(--brand)">
+        Final Score = (OnTime × 0.30) + (Quality × 0.25) + (Price × 0.20) + (Responsiveness × 0.15) + (Accuracy × 0.10)
+      </div>
+    </div>`;
+}
+
+function renderRankings() {
+  const ranked = [...VENDORS].sort((a,b)=>b.rating-a.rating);
+  return `<div class="card">
+    <div class="card-header"><div class="card-title">Vendor Rankings — Jan 2024</div><div class="card-subtitle">Sorted by composite KPI score</div></div>
+    <div class="bar-chart">
+      ${ranked.map((v,i) => {
+        const clr = v.rating>=85?'#16a34a':v.rating>=70?'#2d6aa0':'#dc2626';
+        return `<div class="bar-row">
+          <div style="width:20px;font-size:12px;font-weight:700;color:var(--text-muted);text-align:right">${i+1}</div>
+          <div class="bar-label" style="width:150px;text-align:right;font-size:12px">${v.name.slice(0,20)}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${v.rating}%;background:${clr}">${v.rating}</div></div>
+          <div>${v.status==='Preferred'?'<span class="badge badge-success">Preferred</span>':v.status==='Watchlist'?'<span class="badge badge-danger">Watchlist</span>':'<span class="badge badge-neutral">Approved</span>'}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function renderAlerts() {
+  return `
+    <div class="alert alert-danger"><span>🚨</span><span><strong>2 vendors</strong> are underperforming and flagged for review. Procurement team action required.</span></div>
+    ${VENDORS.filter(v=>v.status==='Watchlist').map(v=>`
+    <div class="card" style="border-left:4px solid var(--danger);margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--danger)">${v.name}</div>
+          <div style="font-size:12px;color:var(--text-muted)">${v.id} • ${v.city} • ${v.category}</div>
+        </div>
+        <div style="text-align:center"><div style="font-size:28px;font-weight:800;color:var(--danger)">${v.rating}</div><div style="font-size:10px">Score</div></div>
+      </div>
+      <div style="margin:12px 0;display:flex;flex-wrap:wrap;gap:6px">
+        ${v.ontime<70?`<span class="badge badge-danger">⚠ Low On-Time: ${v.ontime}%</span>`:''}
+        ${v.responsive<70?`<span class="badge badge-danger">⚠ Low Responsiveness: ${v.responsive}%</span>`:''}
+        ${v.accuracy<70?`<span class="badge badge-danger">⚠ Low Accuracy: ${v.accuracy}%</span>`:''}
+      </div>
+      <div style="font-size:12px;background:var(--danger-light);border-radius:6px;padding:10px;color:#7f1d1d;margin-bottom:10px">
+        <strong>Recommended Action:</strong> Issue formal warning letter. If no improvement in 60 days, delist from approved vendor list. Do not issue new POs above ₹10,000.
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-danger btn-sm">Issue Warning</button>
+        <button class="btn btn-outline btn-sm">View History</button>
+        <button class="btn btn-outline btn-sm">Schedule Review</button>
+      </div>
+    </div>`).join('')}
+    <div class="card" style="border-left:4px solid var(--success)">
+      <div class="card-title" style="margin-bottom:10px">Preferred Vendor Recommendations</div>
+      ${VENDORS.filter(v=>v.status==='Preferred').map(v=>`
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:20px">⭐</span>
+        <div style="flex:1"><div style="font-weight:500">${v.name}</div><div style="font-size:12px;color:var(--text-muted)">${v.category} • Score: ${v.rating}/100</div></div>
+        <span class="badge badge-success">Preferred</span>
+      </div>`).join('')}
+    </div>`;
+}
+
+// ==================== REPORTS ====================
+function renderReports() {
+  return `
+    <div class="grid-2" style="margin-bottom:16px">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Spend by Category</div><div class="card-subtitle">Jan 2024</div></div>
+        <div class="bar-chart">
+          ${[['Safety',42,'#1a3a5c'],['Maintenance',28,'#2d6aa0'],['Office',15,'#3d8dd4'],['Tools',10,'#6fa8e8'],['Other',5,'#a3c4f3']].map(([c,v,cl])=>`
+          <div class="bar-row">
+            <div class="bar-label" style="width:90px">${c}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${v}%;background:${cl}">${v}%</div></div>
+            <div class="bar-val">${v}%</div>
+          </div>`).join('')}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">PR Status Breakdown</div></div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          ${[['Closed/Paid','8','var(--success)'],['GRN Done','3','#0369a1'],['PO Created','4','var(--brand)'],['RFQ Sent','2','#7c3aed'],['Pending Approval','3','var(--warn)'],['Draft','4','var(--text-muted)']].map(([l,v,c])=>`
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:100px;font-size:12px;color:var(--text-muted)">${l}</div>
+            <div style="flex:1;height:18px;background:#f1f5f9;border-radius:4px;overflow:hidden">
+              <div style="width:${parseInt(v)/24*100}%;height:100%;background:${c};display:flex;align-items:center;padding-left:6px;font-size:11px;color:#fff;font-weight:600">${v}</div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Key Procurement KPIs — Jan 2024</div></div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
+        ${[['Avg PR to PO','4.2 days','Days to convert PR to PO','↓ target 5d'],['Savings Achieved','₹12,450','vs. Last Vendor Prices','↑ 8% savings'],['POs on Budget','91%','Within approved estimate','↑ 3% MoM'],['Vendor Fill Rate','96%','Qty delivered vs ordered','↑ steady'],['Invoice Match Rate','100%','3-way match success','✓ no disputes']].map(([k,v,s,c])=>`
+        <div style="background:#f9fafb;border-radius:8px;padding:12px">
+          <div style="font-size:20px;font-weight:800;color:var(--brand)">${v}</div>
+          <div style="font-size:12px;font-weight:600;margin-top:2px">${k}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${s}</div>
+          <div style="font-size:11px;color:var(--success);margin-top:4px;font-weight:500">${c}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ==================== MASTER DATA ====================
+function renderMasterData() {
+  const tabs = ['Vendors','Materials','Users'];
+  return `
+    <div class="tabs">${tabs.map((t,i)=>`<div class="tab ${state.tab===i?'active':''}" data-tab="${i}">${t}</div>`).join('')}</div>
+    ${state.tab === 0 ? renderVendorMaster() : state.tab === 1 ? renderMaterialMaster() : renderUserMaster()}`;
+}
+
+function renderVendorMaster() {
+  return `<div class="card">
+    <div class="card-header"><div class="card-title">Vendor Master (${VENDORS.length} vendors)</div><button class="btn btn-primary btn-sm">+ Add Vendor</button></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>ID</th><th>Vendor Name</th><th>City</th><th>Category</th><th>GSTIN</th><th>Contact</th><th>Score</th><th>Status</th></tr></thead>
+      <tbody>${VENDORS.map(v=>`<tr>
+        <td style="font-family:var(--mono);font-size:12px;color:var(--brand)">${v.id}</td>
+        <td style="font-weight:500">${v.name}</td><td>${v.city}</td><td><span class="chip">${v.category}</span></td>
+        <td style="font-family:var(--mono);font-size:11px">${v.gstin}</td>
+        <td style="font-family:var(--mono);font-size:12px">${v.contact}</td>
+        <td><strong style="color:${v.rating>=85?'var(--success)':v.rating>=70?'var(--warn)':'var(--danger)'}">${v.rating}</strong></td>
+        <td>${v.status==='Preferred'?'<span class="badge badge-success">Preferred</span>':v.status==='Watchlist'?'<span class="badge badge-danger">Watchlist</span>':'<span class="badge badge-neutral">Approved</span>'}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+  </div>`;
+}
+
+function renderMaterialMaster() {
+  return `<div class="card">
+    <div class="card-header"><div class="card-title">Material Master (${MATERIALS.length} materials)</div><button class="btn btn-primary btn-sm">+ Add Material</button></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Code</th><th>Material Name</th><th>Category</th><th>Unit</th><th>Std. Price (₹)</th><th>Stock</th></tr></thead>
+      <tbody>${MATERIALS.map(m=>`<tr>
+        <td style="font-family:var(--mono);font-size:12px;color:var(--brand)">${m.id}</td>
+        <td style="font-weight:500">${m.name}</td>
+        <td><span class="chip">${m.category}</span></td>
+        <td>${m.unit}</td><td>₹${m.price.toLocaleString('en-IN')}</td>
+        <td><span style="color:${m.stock<20?'var(--danger)':m.stock<50?'var(--warn)':'var(--success)'};font-weight:600">${m.stock}</span></td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+  </div>`;
+}
+
+function renderUserMaster() {
+  return `<div class="card">
+    <div class="card-header"><div class="card-title">User Accounts & Roles</div><button class="btn btn-primary btn-sm">+ Add User</button></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>User</th><th>Email</th><th>Department</th><th>Role</th><th>Access Level</th></tr></thead>
+      <tbody>${USERS.map(u=>`<tr>
+        <td><div style="display:flex;align-items:center;gap:8px">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">${u.initials}</div>
+          <span style="font-weight:500">${u.name}</span>
+        </div></td>
+        <td style="font-size:12px;color:var(--text-muted)">${u.email}</td>
+        <td>${u.dept}</td>
+        <td><span class="badge badge-info">${u.role}</span></td>
+        <td style="font-size:12px">${u.role==='Admin'?'Full Access':u.role==='Purchase Manager'?'Approve + View':u.role==='Finance User'?'Invoice + Payment':'View + Request'}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+  </div>`;
+}
+
+// ==================== HELPERS ====================
+function statusBadge(s) {
+  const map = {
+    'Approved':'badge-success','Closed':'badge-success','Paid':'badge-success','Delivered':'badge-success','GRN Done':'badge-success',
+    'Pending':'badge-warn','In Transit':'badge-info','RFQ Sent':'badge-purple','GRN Pending':'badge-info',
+    'PO Created':'badge-info','Invoice Pending':'badge-warn','Rejected':'badge-danger',
+  };
+  return `<span class="badge ${map[s]||'badge-neutral'}">${s}</span>`;
+}
+
+function priorityBadge(p) {
+  const map = { Critical:'badge-danger', High:'badge-warn', Normal:'badge-neutral' };
+  return `<span class="badge ${map[p]||'badge-neutral'}">${p}</span>`;
+}
+
+// ==================== EVENT BINDING ====================
+function bindAppEvents() {
+  // Sidebar nav
+  document.querySelectorAll('[data-page]').forEach(el => {
+    el.addEventListener('click', () => { state.page = el.dataset.page; state.tab = 0; state.vendorTab = 0; render(); });
+  });
+  // Tabs
+  document.querySelectorAll('[data-tab]').forEach(el => {
+    el.addEventListener('click', () => { state.tab = parseInt(el.dataset.tab); render(); });
+  });
+  // Vendor tabs
+  document.querySelectorAll('[data-vendor-tab]').forEach(el => {
+    el.addEventListener('click', () => { state.vendorTab = parseInt(el.dataset.vendorTab); render(); });
+  });
+  // Tab switch buttons
+  document.querySelectorAll('[data-tab-switch]').forEach(el => {
+    el.addEventListener('click', () => { state.tab = parseInt(el.dataset.tabSwitch); render(); });
+  });
+  // Logout
+  const logout = document.getElementById('logout-btn');
+  if (logout) logout.addEventListener('click', () => { state.page = 'login'; state.currentUser = null; render(); });
+  // PR submit
+  const prBtn = document.getElementById('pr-submit-btn');
+  if (prBtn) prBtn.addEventListener('click', () => {
+    alert('PR submitted successfully!\n\nPR-2024-007 created.\nSent for approval to: Rajesh Sharma (Purchase Manager)\nExpected response: Within 24 hours.');
+  });
+}
+
+function approveReject(id, action) {
+  const pr = REQUISITIONS.find(r => r.id === id);
+  if (pr) {
+    pr.status = action === 'approve' ? 'Approved' : 'Rejected';
+    pr.approver = state.currentUser.name;
+    if (action === 'approve') alert(`${id} Approved!\nNext step: Buyer will issue RFQ to shortlisted vendors.`);
+    else alert(`${id} Rejected.\nRequester will be notified with reason.`);
+    render();
+  }
+}
+
+function openPRModal(id) {
+  const pr = REQUISITIONS.find(r => r.id === id);
+  if (!pr) return;
+  const existing = document.querySelector('.modal-bg');
+  if (existing) existing.remove();
+  const div = document.createElement('div');
+  div.className = 'modal-bg';
+  div.innerHTML = `<div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">${pr.id} — PR Details</div>
+      <button class="modal-close" onclick="this.closest('.modal-bg').remove()">×</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;background:#f9fafb;border-radius:8px;padding:14px;margin-bottom:14px">
+      <div><span style="color:var(--text-muted)">Department:</span> <strong>${pr.dept}</strong></div>
+      <div><span style="color:var(--text-muted)">Date:</span> <strong>${pr.date}</strong></div>
+      <div><span style="color:var(--text-muted)">Requester:</span> <strong>${pr.requester}</strong></div>
+      <div><span style="color:var(--text-muted)">Approver:</span> <strong>${pr.approver||'Pending'}</strong></div>
+      <div style="grid-column:span 2"><span style="color:var(--text-muted)">Material:</span> <strong>${pr.material}</strong></div>
+      <div><span style="color:var(--text-muted)">Quantity:</span> <strong>${pr.qty} ${pr.unit}</strong></div>
+      <div><span style="color:var(--text-muted)">Est. Value:</span> <strong>₹${pr.estValue.toLocaleString('en-IN')}</strong></div>
+      <div><span style="color:var(--text-muted)">Priority:</span> ${priorityBadge(pr.priority)}</div>
+      <div><span style="color:var(--text-muted)">Status:</span> ${statusBadge(pr.status)}</div>
+      <div style="grid-column:span 2"><span style="color:var(--text-muted)">Remarks:</span> <strong>${pr.remarks||'—'}</strong></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      ${pr.status==='Pending'?`<button class="btn btn-success" onclick="approveReject('${pr.id}','approve');this.closest('.modal-bg').remove()">Approve</button><button class="btn btn-danger" onclick="approveReject('${pr.id}','reject');this.closest('.modal-bg').remove()">Reject</button>`:''}
+      <button class="btn btn-outline" onclick="this.closest('.modal-bg').remove()">Close</button>
+    </div>
+  </div>`;
+  document.body.appendChild(div);
+}
+
+// ==================== INIT ====================
+render();
+</script>
+</body>
+</html>
